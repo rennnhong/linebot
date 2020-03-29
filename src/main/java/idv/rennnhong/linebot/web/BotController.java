@@ -22,7 +22,7 @@ public class BotController {
     @PostMapping
     public String processEvents(@RequestHeader("X-Line-Signature") String signature, @RequestBody Object body) throws JsonProcessingException {
 //        System.out.println("signature = " + signature);
-//        System.out.println("request body = " + body);
+        System.out.println("request body = " + body);
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(body);
         Webhook webhook = mapper.readValue(json, Webhook.class);
@@ -34,6 +34,7 @@ public class BotController {
                 HttpHeaders requestHeaders = new HttpHeaders();
                 requestHeaders.setBearerAuth(token);
                 HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
+                checkRequestBody(requestEntity);
                 ResponseEntity<String> res = rt.exchange("https://api.line.me/v2/bot/profile/{userId}", HttpMethod.GET, requestEntity, String.class, event.getMessage().getId());
                 String str = res.getBody();
                 JsonNode node = mapper.readTree(str);
