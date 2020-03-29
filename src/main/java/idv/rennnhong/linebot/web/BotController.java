@@ -22,9 +22,10 @@ public class BotController {
     @PostMapping
     public String processEvents(@RequestHeader("X-Line-Signature") String signature, @RequestBody Object body) throws JsonProcessingException {
 //        System.out.println("signature = " + signature);
-        System.out.println("request body = " + body);
+//        System.out.println("request body = " + body);
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(body);
+        System.out.println("request body = " + json);
         Webhook webhook = mapper.readValue(json, Webhook.class);
 
         for (Webhook.Event event : webhook.getEvents()) {
@@ -35,7 +36,7 @@ public class BotController {
                 requestHeaders.setBearerAuth(token);
                 HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
                 checkRequestBody(requestEntity);
-                ResponseEntity<String> res = rt.exchange("https://api.line.me/v2/bot/profile/{userId}", HttpMethod.GET, requestEntity, String.class, event.getMessage().getId());
+                ResponseEntity<String> res = rt.exchange("https://api.line.me/v2/bot/profile/{userId}", HttpMethod.GET, requestEntity, String.class, event.getSource().getUserId());
                 String str = res.getBody();
                 JsonNode node = mapper.readTree(str);
                 String displayName = node.get("displayName").asText();
@@ -47,7 +48,7 @@ public class BotController {
                 List<LBReplyMessage.Message> messages = new ArrayList<>();
                 messages.add(new LBReplyMessage.Message("text",
                         String.format("您的資訊如下:\n%s\n%s\n%s\n%s\n",
-                                displayName,userId,pictureUrl,statusMessage)));
+                                displayName, userId, pictureUrl, statusMessage)));
 
                 LBReplyMessage lbReplyMessage = new LBReplyMessage();
                 lbReplyMessage.setReplyToken(event.getReplyToken());
@@ -68,7 +69,6 @@ public class BotController {
                         httpEntity,
                         String.class
                 );
-
             }
         }
         return "hahahaha";
