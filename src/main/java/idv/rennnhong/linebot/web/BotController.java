@@ -39,10 +39,10 @@ public class BotController {
                 ResponseEntity<String> res = rt.exchange("https://api.line.me/v2/bot/profile/{userId}", HttpMethod.GET, requestEntity, String.class, event.getSource().getUserId());
                 String str = res.getBody();
                 JsonNode node = mapper.readTree(str);
-                String displayName = node.get("displayName").asText();
-                String userId = node.get("userId").asText();
-                String pictureUrl = node.get("pictureUrl").asText();
-                String statusMessage = node.get("statusMessage").asText();
+                String displayName =  node.get("displayName") != null?node.get("displayName").asText():"";
+                String userId =  node.get("userId") != null?node.get("userId").asText():"";
+                String pictureUrl =  node.get("pictureUrl") != null?node.get("pictureUrl").asText():"";
+                String statusMessage = node.get("statusMessage") != null?node.get("statusMessage").asText():"";
 
 
                 List<LBReplyMessage.Message> messages = new ArrayList<>();
