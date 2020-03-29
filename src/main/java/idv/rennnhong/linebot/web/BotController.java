@@ -1,13 +1,12 @@
 package idv.rennnhong.linebot.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import idv.rennnhong.linebot.dto.LBReplyMessage;
 import idv.rennnhong.linebot.dto.Webhook;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,8 +31,22 @@ public class BotController {
             if (event.getType().equals("message")) {
                 RestTemplate rt = new RestTemplate();
 
+                HttpHeaders requestHeaders = new HttpHeaders();
+                requestHeaders.setBearerAuth(token);
+                HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
+                ResponseEntity<String> res = rt.exchange("https://api.line.me/v2/bot/profile/{userId}", HttpMethod.GET, requestEntity, String.class, event.getMessage().getId());
+                String str = res.getBody();
+                JsonNode node = mapper.readTree(str);
+                String displayName = node.get("displayName").asText();
+                String userId = node.get("userId").asText();
+                String pictureUrl = node.get("pictureUrl").asText();
+                String statusMessage = node.get("statusMessage").asText();
+
+
                 List<LBReplyMessage.Message> messages = new ArrayList<>();
-                messages.add(new LBReplyMessage.Message("text", String.format("你說%s嗎", event.getMessage().getText())));
+                messages.add(new LBReplyMessage.Message("text",
+                        String.format("您的資訊如下:\n%s\n%s\n%s\n%s\n",
+                                displayName,userId,pictureUrl,statusMessage)));
 
                 LBReplyMessage lbReplyMessage = new LBReplyMessage();
                 lbReplyMessage.setReplyToken(event.getReplyToken());
