@@ -1,5 +1,6 @@
 package idv.rennnhong.linebot.dto;
 
+
 public abstract class Message {
     private String id;
     private String type;
