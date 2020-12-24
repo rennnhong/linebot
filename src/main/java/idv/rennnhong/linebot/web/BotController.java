@@ -60,7 +60,7 @@ public class BotController {
 
     private String chopStr(String str) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(str));
-        return str.length() > 40 ? str.substring(0,40) + "..." : str;
+        return str.length() > 40 ? str.substring(0, 40) + "..." : str;
     }
 
     @EventMapping
@@ -89,9 +89,14 @@ public class BotController {
 //                replyMessages.add(tmpPlaceMessage);
 //            }
 
+
+            // TODO column上限為10筆，需想想超過的處理方式，這邊為了測試先把長度固定為10筆
+            List<List<Place>> partition = Lists.partition(nearByPlaces, 10);
+            nearByPlaces = partition.get(0);
             List<CarouselColumn> carouselColumns = nearByPlaces.stream().map(
                     place -> new CarouselColumn(
-                            U,
+                            Strings.isNullOrEmpty(place.getReference()) ? null :
+                                    messageHandler.getPlacePhotoUri(place.getReference(), 600, 600),
                             place.getName(),
                             chopStr(place.getAddress()),
                             Lists.newArrayList(new URIAction("來去看看",

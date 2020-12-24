@@ -1,6 +1,7 @@
 package idv.rennnhong.linebot.message;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.linecorp.bot.client.LineBlobClient;
@@ -16,9 +17,10 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -103,18 +105,21 @@ public class MessageHandler {
             throw new RuntimeException(e);
         }
     }
-//
-//    public URI getPlacePhotoUri(String reference, Integer maxWidth, Integer maxHeight) {
-//        Preconditions.checkArgument(Objects.nonNull(maxWidth) || Objects.nonNull(maxHeight), "maxWidth or maxHeight must has value each one");
-//
-//        Map<String, Object> params = Maps.newHashMap();
-//        params.put("photoreference ", reference);
-//        if (Objects.nonNull(maxWidth)) params.put("maxwidth  ", maxWidth);
-//        if (Objects.nonNull(maxHeight)) params.put("maxheight  ", maxHeight);
-////        UriBuilder build = new UriComponentsBuilder();
-////                .queryParam(params).build();
-////
-////        "https://maps.googleapis.com/maps/api/place/photo"
-//    }
+
+    public URI getPlacePhotoUri(String reference, Integer maxWidth, Integer maxHeight) {
+        Preconditions.checkArgument(Objects.nonNull(maxWidth) || Objects.nonNull(maxHeight), "maxWidth or maxHeight must has value each one");
+
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("photoreference ", reference);
+        if (Objects.nonNull(maxWidth)) params.put("maxwidth  ", maxWidth);
+        if (Objects.nonNull(maxHeight)) params.put("maxheight  ", maxHeight);
+        params.put("key","AIzaSyBiX5cBID4LA1YpY4oI8exvHZGgsUCXFXE");
+
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory("https://maps.googleapis.com/maps/api/place/photo");
+        UriBuilder builder = factory.builder();
+        params.entrySet().forEach(param -> builder.queryParam(param.getKey(),param.getValue()));
+
+        return builder.build();
+    }
 
 }

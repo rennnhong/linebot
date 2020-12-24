@@ -1,7 +1,9 @@
 package idv.rennnhong.linebot.service.impl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.ObjectArrays;
 import com.google.maps.GeoApiContext;
 import com.google.maps.NearbySearchRequest;
 import com.google.maps.PlaceDetailsRequest;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PlaceServiceImpl implements PlaceService {
@@ -38,12 +41,10 @@ public class PlaceServiceImpl implements PlaceService {
                 String placeId = result.placeId;
                 PlaceDetailsRequest placeDetailsRequest = PlacesApi.placeDetails(context, placeId);
                 PlaceDetails placeDetails = placeDetailsRequest.await();
-                placeResults.add(new Place(
-                        placeDetails.name,
-                        placeDetails.formattedAddress,
-                        placeDetails.url.toString(),
-                        placeDetails.photos[0].photoReference
-                ));
+
+                String placePhotoRef = Objects.isNull(placeDetails.photos) || Objects.isNull(placeDetails.photos[0])? "" : placeDetails.photos[0].photoReference;
+                Place place = new Place(placeDetails.name, placeDetails.formattedAddress, placeDetails.url.toString(), placePhotoRef);
+                placeResults.add(place);
             }
         } catch (ApiException e) {
             e.printStackTrace();

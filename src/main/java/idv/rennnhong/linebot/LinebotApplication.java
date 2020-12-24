@@ -23,7 +23,7 @@ public class LinebotApplication {
     @Bean
     public GeoApiContext context() {
         return new GeoApiContext.Builder()
-                .apiKey("input your own key")
+                .apiKey("AIzaSyBiX5cBID4LA1YpY4oI8exvHZGgsUCXFXE")
                 .build();
     }
 
